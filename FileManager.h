@@ -22,13 +22,14 @@ namespace tebd {
 			
 			std::string s_folderPath;
 			
-			void _p_fileCheck (void);
+			void _p_fileCheck (unsigned short updateInterval);
 			
 		public:
 			FileManager (std::string &folderPath);
 			~FileManager (void);
 			
-			void startFileCheck (void);
+			//intervalo de atualizacao em millisegundos
+			void startFileCheck (unsigned short updateInterval);
 			void stopFileCheck (void);
 			
 			inline std::thread* getFileCheckThread (void) {
