@@ -9,8 +9,8 @@ all: $(OBJS)
 %.o: %.cpp
 	$(CCX) -c $<
 	
-test_%: $(OBJS) %.o
-	$(CCX) $(CFLAGS) $@.cpp $^ -o $@ $(LFLAGS)
+test_%: test_%.cpp $(OBJS) %.o
+	$(CCX) $(CFLAGS) $^ -o $@ $(LFLAGS)
 	
 clean:
 	rm -f *.o

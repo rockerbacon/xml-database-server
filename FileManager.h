@@ -26,7 +26,7 @@ namespace tebd {
 			void _p_fileCheck (unsigned short updateInterval);
 			
 		public:
-			FileManager (std::string &folderPath);
+			FileManager (const std::string &folderPath);
 			~FileManager (void);
 			
 			//intervalo de atualizacao em millisegundos
@@ -35,6 +35,9 @@ namespace tebd {
 			
 			inline std::thread* getFileCheckThread (void) {
 				return this->thd_fileCheck;
+			}
+			inline int getFileCount (void) {
+				return this->que_files.size();
 			}
 	};
 
