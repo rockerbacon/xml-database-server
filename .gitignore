@@ -1,2 +1,3 @@
 *.o
 requests/*
+test_*

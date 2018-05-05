@@ -15,10 +15,10 @@ namespace tebd {
 	
 		public:
 			//operador & antes da variavel indica que argumento deve ser passado por referencia
-			public Aluno (std::string &cpf, std::string &nome, std::string &universidade, std::string &curso);
+			Aluno (std::string &cpf, std::string &nome, std::string &universidade, std::string &curso);
 		
 			virtual void insertIntoDb (void);
 	
-	}
+	};
 
 };

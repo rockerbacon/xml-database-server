@@ -10,12 +10,13 @@
 #include <list>
 #include <atomic>
 #include <thread>
+#include <experimental/filesystem>
 
 namespace tebd {
 
 	class FileManager {
 		private:
-			std::list<std::string> que_files;
+			std::list<std::experimental::filesystem::directory_entry> que_files;
 			
 			std::atomic_bool b_fileCheck;
 			std::thread *thd_fileCheck;
