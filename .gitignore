@@ -1,3 +1,4 @@
 *.o
 requests/*
 test_*
+*.log

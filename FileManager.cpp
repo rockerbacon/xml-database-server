@@ -19,6 +19,10 @@ FileManager::FileManager (const string &s_folderPath, const string &xsd) throw (
 	this->s_folderPath = realpath(s_folderPath.c_str(), NULL);
 	this->thd_fileCheck = NULL;
 	this->s_xsdPath = realpath(xsd.c_str(), NULL);
+	if (FileManager::_instanceCount == 0) {
+		XMLPlatformUtils::Initialize();
+	}
+	FileManager::_instanceCount++;
 }
 
 FileManager::~FileManager (void) {
@@ -37,17 +41,17 @@ void FileManager::_p_fileCheck (unsigned short updateInterval) {
 	while (this->b_fileCheck) {
 		
 		bool updated = false;
-		for (auto &file : fs::directory_iterator(fs::current_path()/this->s_folderPath)) {
+		for (auto &file : fs::directory_iterator(this->s_folderPath)) {
 			auto ftime = fs::last_write_time(file); 
 			std::time_t cftime = decltype(ftime)::clock::to_time_t(ftime);
 			
-			if (this->_validate(this->s_xsdPath, file.path().string())) {
-				if (cftime > t_lastUpdate) {
-					this->que_files.push_back(file);
-					updated = true;
+			if (cftime > t_lastUpdate) {
+				if (this->_validate(this->s_xsdPath, file.path().string())) {
+						this->que_files.push_back(file);
+						updated = true;
+				} else {
+					log("Arquivo "+file.path().string()+" possui formato invalido");
 				}
-			} else {
-				log("Arquivo "+file.path().string()+" possui formato invalido");
 			}
 		}
 		if (updated) t_lastUpdate = std::time(NULL);
