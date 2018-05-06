@@ -2,6 +2,10 @@
 #include <chrono>
 #include <ctime>
 #include <iostream>
+#include <stdlib.h>
+#include <xercesc/parsers/XercesDOMParser.hpp>
+#include <xercesc/util/XMLString.hpp>
+#include <xercesc/sax/HandlerBase.hpp>
 
 using namespace tebd;
 using namespace std;
@@ -11,8 +15,9 @@ unsigned int FileManager::_instanceCount = 0;
 
 FileManager::FileManager (const string &s_folderPath, const string &xsd) throw (XMLException) {
 	this->b_fileCheck = false;
-	this->s_folderPath = s_folderPath;
+	this->s_folderPath = realpath(s_folderPath.c_str(), NULL);
 	this->thd_fileCheck = NULL;
+	this->s_xsdPath = realpath(xsd.c_str(), NULL);
 }
 
 FileManager::~FileManager (void) {
@@ -35,12 +40,14 @@ void FileManager::_p_fileCheck (unsigned short updateInterval) {
 			auto ftime = fs::last_write_time(file); 
 			std::time_t cftime = decltype(ftime)::clock::to_time_t(ftime);
 			
-			if (cftime > t_lastUpdate) {
-				this->que_files.push_back(file);
-				updated = true;
+			if (this->_validate(this->s_xsdPath, file.path().string())) {
+				if (cftime > t_lastUpdate) {
+					this->que_files.push_back(file);
+					updated = true;
+				}
+			} else {
+				//TODO log erro de arquivo invalido
 			}
-			
-			//TODO filtrar arquivos invalidos
 		}
 		if (updated) t_lastUpdate = std::time(NULL);
 		std::this_thread::sleep_for(std::chrono::duration<unsigned short, std::milli>(updateInterval));
@@ -50,20 +57,26 @@ void FileManager::_p_fileCheck (unsigned short updateInterval) {
 
 bool FileManager::_validate (const string &xsdPath, const string &xmlPath) {
 	XercesDOMParser domParser;     
-	if (domParser.loadGrammar(xsdPath, Grammar::SchemaGrammarType) == NULL) {
-		throw Except("Unable to load xsd");
+	if (domParser.loadGrammar(xsdPath.c_str(), Grammar::SchemaGrammarType) == NULL) {
+		throw exception();	//TODO improve exception handling
 	}
+	ErrorHandler *err = (ErrorHandler*) new HandlerBase();
 
-	ParserErrorHandler parserErrorHandler;
-
-	domParser.setErrorHandler(&parserErrorHandler);
+	domParser.setErrorHandler(err);
 	domParser.setValidationScheme(XercesDOMParser::Val_Always);
 	domParser.setDoNamespaces(true);
 	domParser.setDoSchema(true);
 	domParser.setValidationSchemaFullChecking(true);
-	domParser.setExternalNoNamespaceSchemaLocation(xsd);
+	domParser.setExternalNoNamespaceSchemaLocation(xsdPath.c_str());
 
-	domParser.parse(xmlPath);
+	try {
+		domParser.parse(xmlPath.c_str());
+	} catch (XMLException &e) {
+		char *message = XMLString::transcode(e.getMessage());
+		//TODO log error message
+		XMLString::release(&message);
+	}
+	delete err;
 	if(domParser.getErrorCount() != 0) {     
 		return false;
 	}

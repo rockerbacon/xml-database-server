@@ -17,7 +17,7 @@ namespace tebd {
 
 	class FileManager {
 		private:
-			unsigned int _instanceCount;
+			static unsigned int _instanceCount;
 		
 			std::list<std::experimental::filesystem::directory_entry> que_files;
 			
@@ -25,8 +25,7 @@ namespace tebd {
 			std::thread *thd_fileCheck;
 			
 			std::string s_folderPath;
-			
-			xercesc::XercesDOMParser parser;
+			std::string s_xsdPath;
 			
 			void _p_fileCheck (unsigned short updateInterval);
 			
