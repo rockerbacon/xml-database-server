@@ -16,6 +16,7 @@ unsigned int FileManager::_instanceCount = 0;
 
 FileManager::FileManager (const string &s_folderPath, const string &xsd) throw (XMLException) {
 	this->b_fileCheck = false;
+	this->b_fileParse = false;
 	this->s_folderPath = realpath(s_folderPath.c_str(), NULL);
 	this->thd_fileCheck = NULL;
 	this->s_xsdPath = realpath(xsd.c_str(), NULL);
@@ -47,7 +48,7 @@ void FileManager::_p_fileCheck (unsigned short updateInterval) {
 			
 			if (cftime > t_lastUpdate) {
 				if (this->_validate(this->s_xsdPath, file.path().string())) {
-						this->que_files.push_back(file);
+						this->que_files.load().push_back(file);
 						updated = true;
 				} else {
 					log("Arquivo "+file.path().string()+" possui formato invalido");
@@ -58,6 +59,61 @@ void FileManager::_p_fileCheck (unsigned short updateInterval) {
 		std::this_thread::sleep_for(std::chrono::duration<unsigned short, std::milli>(updateInterval));
 	}
 
+}
+
+void FileManager::_p_fileParse (void) {
+	XercesDOMParser parser;
+	XMLCh *tag_method = XMLString::transcode("methodName");
+	XMLCh *tag_params = XMLString::transcode("params");
+	XMLCh *tag_param = XMLString::transcode("param");
+	XMLCh *tag_boletim = XMLString::transcode("boletim");
+	XMLCh *tag_historico = XMLString::transcode("historico");
+	
+	parser.setValidationScheme(XercesDOMParser::Val_Never);
+	parser.setDoNamespaces(false);
+	parser.setDoSchema(false);
+	parser.setLoadExternalDTD(false);
+	
+	while (this->b_fileParse) {
+		if (this->que_files.load().size() > 0) {
+			string s_file = this->que_files.load().front().string();
+			this->que_files.load().pop_front();
+			
+			try {
+			
+				parser.parse(s_file);
+				DOMDocument *doc = parser.getDocument();
+				DOMElement *node = doc->getDocumentElement();
+				if (node == NULL) {
+					log("Empty document "+s_file);
+					continue;
+				}
+				
+				const XMLCh *method = node->getAttribute(tag_method);
+				
+				DOMNodeList *l_children = node->getChildNodes();
+				const XMLSize_t i_childrenLength = l_children->getLength();
+				
+				//buscar chamadas de metodos
+				for (XMLSize_t i = 0; i < i_childrenLength; ++i) {
+					DOMNode *child = n->item(i);
+					DOMElement *e = dynamic_cast<DOMElement*>(child);
+					if (XMLString::equals(e->getTagName(), tag_method)) {
+						const XMLCh *method = e->getAttribute(tag_method);
+					} else if (XMLString::equals(e->getTagName(), tag_param)) {
+					
+					}
+					
+				}
+				
+			} catch (XMLException &e) {
+				
+			}
+			
+		}
+	}
+	
+	XMLString::release(&tag_method);
 }
 
 bool FileManager::_validate (const string &xsdPath, const string &xmlPath) {
@@ -99,5 +155,19 @@ void FileManager::startFileCheck (unsigned short updateInterval) {
 void FileManager::stopFileCheck (void) {
 	if (this->b_fileCheck) {
 		this->b_fileCheck = false;
+	}
+}
+
+void FileManager::startFileParse (void) {
+	if (!this->b_fileParse) {
+		this->b_fileParse = true;
+		if (this->thd_fileParse != NULL) delete (this->thd_fileParse);
+		this->thd_fileParse = new thread(&FileManager::_p_fileParse, this);
+	}
+}
+
+void FileManager::stopFileParse (void) {
+	if (this->b_fileParse) {
+		this->b_fileParse = false;
 	}
 }
