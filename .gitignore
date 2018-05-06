@@ -1,4 +1,6 @@
 *.o
 requests/*
+*.db
 test_*
+.vscode
 *.log
