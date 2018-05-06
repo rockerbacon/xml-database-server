@@ -6,6 +6,7 @@
 #include <xercesc/parsers/XercesDOMParser.hpp>
 #include <xercesc/util/XMLString.hpp>
 #include <xercesc/sax/HandlerBase.hpp>
+#include "Log.h"
 
 using namespace tebd;
 using namespace std;
@@ -46,7 +47,7 @@ void FileManager::_p_fileCheck (unsigned short updateInterval) {
 					updated = true;
 				}
 			} else {
-				//TODO log erro de arquivo invalido
+				log("Arquivo "+file.path().string()+" possui formato invalido");
 			}
 		}
 		if (updated) t_lastUpdate = std::time(NULL);
@@ -73,7 +74,7 @@ bool FileManager::_validate (const string &xsdPath, const string &xmlPath) {
 		domParser.parse(xmlPath.c_str());
 	} catch (XMLException &e) {
 		char *message = XMLString::transcode(e.getMessage());
-		//TODO log error message
+		log(message);
 		XMLString::release(&message);
 	}
 	delete err;
