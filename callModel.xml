@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<methodCall>
+    <methodName></methodName>
+    <params>
+        <param>
+            <boletim>
+                <aluno>
+                    <cpf></cpf>
+                    <nome></nome>
+                    <universidade></universidade>
+                    <curso></curso>
+                </aluno>
+                <historico>
+                    <periodo>
+                        <ano></ano>
+                        <semestre></semestre>
+                        <materia>
+                            <codigo></codigo>
+                            <nome></nome>
+                            <creditos></creditos>
+                            <conceito></conceito>
+                            <situacao></situacao>
+                        </materia>
+                    </periodo>
+                </historico>
+            </boletim>
+        </param>
+    </params>
+</methodCall>
