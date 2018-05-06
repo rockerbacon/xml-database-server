@@ -16,6 +16,7 @@ namespace tebd {
 			virtual ~Database();
 		
 			int execute_insert(std::string tabela, std::string valores);
+			//int execute_select(std::string tabela, std::string colunas);
 	
 	};
 

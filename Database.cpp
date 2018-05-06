@@ -1,10 +1,7 @@
 #include "Database.h"
-#include <sqlite3.h>
-#include <iostream>
 
-//Construtor
-tebd::Database::Database () {
-    //Instacia o DB
+//TODO implementar metodo de insercao de aluno no banco
+tebd::Database::Database(){
     int result = sqlite3_open("TEBD.db", &db);
     if (result) {
         printf("Não foi possível abrir o banco de dados. Erro:%s ", sqlite3_errmsg(db));
@@ -18,16 +15,14 @@ tebd::Database::Database () {
     //      printf(stderr, "Não foi possível criar");
         delete erro;
     }
-}
+    }
 
-//Destrutor
-tebd::Database::~Database(){ 
-   sqlite3_close(db);
+tebd::Database::~Database() {
+    sqlite3_close(db);
 }
 
 int tebd::Database::execute_insert(std::string tabela, std::string valores){
     std::string nonquery = "INSERT INTO "+tabela+" VALUES ("+valores+")";
-    std::cout << nonquery;
     char *erro=NULL;
     int result = sqlite3_exec(db, nonquery.c_str(), NULL, NULL, &erro);
     if (erro!=NULL) {
@@ -35,6 +30,3 @@ int tebd::Database::execute_insert(std::string tabela, std::string valores){
     }
     return result;
 }
-
-
-

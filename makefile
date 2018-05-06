@@ -1,6 +1,16 @@
-CXX=g++ -std=c++11
+CCX=g++ -std=c++11
 #toda vez que um novo arquivo .cpp eh criado DEVE SER ADICIONADO AQUI com a terminacao .o
-OBJS=Aluno.o,Database.o
+OBJS=Aluno.o Database.o
+CFLAGS=-pthread
+LFLAGS=-lsqlite3
+
+all: $(OBJS)
 
 %.o: %.cpp
-	$(CCX) $^ -o $< -lsqlite3
+	$(CCX) -c $<
+	
+test_%: test_%.cpp $(OBJS) %.o
+	$(CCX) $(CFLAGS) $^ -o $@ $(LFLAGS)
+	
+clean:
+	rm -f *.o
