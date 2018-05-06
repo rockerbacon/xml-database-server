@@ -26,9 +26,9 @@ void Materia::buildFromXml (DOMNode *node) {
 		} else if (XMLString::Equals(tag, tag_nome)) {
 			this->nome = XMLString::transcode(n->getNodeValue());
 		} else if (XMLString::Equals(tag, tag_creditos)) {
-			this->creditos = XMLString::transcode(n->getNodeValue());
+			this->creditos = stoi(XMLString::transcode(n->getNodeValue()));
 		} else if (XMLString::Equals(tag, tag_conceito)) {
-			this->conceito = XMLString::transcode(n->getNodeValue());
+			this->conceito = stod(XMLString::transcode(n->getNodeValue()));
 		} else if (XMLString::Equals(tag, tag_situacao)) {
 			this->situacao = XMLString::transcode(n->getNodeValue());
 		}
