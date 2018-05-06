@@ -26,14 +26,14 @@ void Aluno::buildFromXml (DOMNode *node) {
 	DOMNodeList *l_children = node->getChildNodes();
 	for (XMLSize_t i = 0; i < l_children->getLength(); ++i) {
 		DOMNode *n = l_children->item(i);
-		XMLCh *tag = n->getName();
-		if (XMLString::Equals(tag, tag_cpf)) {
+		const XMLCh *tag = n->getNodeName();
+		if (XMLString::equals(tag, tag_cpf)) {
 			this->cpf = XMLString::transcode(n->getNodeValue());
-		} else if (XMLString::Equals(tag, tag_nome)) {
+		} else if (XMLString::equals(tag, tag_nome)) {
 			this->nome = XMLString::transcode(n->getNodeValue());
-		} else if (XMLString::Equals(tag, tag_universidade)) {
+		} else if (XMLString::equals(tag, tag_universidade)) {
 			this->universidade = XMLString::transcode(n->getNodeValue());
-		} else if (XMLString::Equals(tag, tag_curso)) {
+		} else if (XMLString::equals(tag, tag_curso)) {
 			this->curso = XMLString::transcode(n->getNodeValue());
 		}
 	}

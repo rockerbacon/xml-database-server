@@ -7,6 +7,8 @@
 #include <xercesc/util/XMLString.hpp>
 #include <xercesc/sax/HandlerBase.hpp>
 #include "Log.h"
+#include "Aluno.h"
+#include "Periodo.h"
 
 using namespace tebd;
 using namespace std;
@@ -48,7 +50,7 @@ void FileManager::_p_fileCheck (unsigned short updateInterval) {
 			
 			if (cftime > t_lastUpdate) {
 				if (this->_validate(this->s_xsdPath, file.path().string())) {
-						this->que_files.load().push_back(file);
+						this->que_files.push_back(file);
 						updated = true;
 				} else {
 					log("Arquivo "+file.path().string()+" possui formato invalido");
@@ -65,23 +67,19 @@ void FileManager::_p_fileParse (void) {
 	XercesDOMParser parser;
 	XMLCh *tag_method = XMLString::transcode("methodName");
 	XMLCh *tag_params = XMLString::transcode("params");
-	XMLCh *tag_param = XMLString::transcode("param");
-	XMLCh *tag_boletim = XMLString::transcode("boletim");
 	XMLCh *tag_historico = XMLString::transcode("historico");
+	string request_method;
 	
-	parser.setValidationScheme(XercesDOMParser::Val_Never);
-	parser.setDoNamespaces(false);
-	parser.setDoSchema(false);
 	parser.setLoadExternalDTD(false);
 	
 	while (this->b_fileParse) {
-		if (this->que_files.load().size() > 0) {
-			string s_file = this->que_files.load().front().string();
-			this->que_files.load().pop_front();
+		if (this->que_files.size() > 0) {
+			string s_file = this->que_files.front().path().string();
+			this->que_files.pop_front();
 			
 			try {
 			
-				parser.parse(s_file);
+				parser.parse(s_file.c_str());
 				DOMDocument *doc = parser.getDocument();
 				DOMElement *node = doc->getDocumentElement();
 				if (node == NULL) {
@@ -89,31 +87,63 @@ void FileManager::_p_fileParse (void) {
 					continue;
 				}
 				
-				const XMLCh *method = node->getAttribute(tag_method);
-				
-				DOMNodeList *l_children = node->getChildNodes();
-				const XMLSize_t i_childrenLength = l_children->getLength();
-				
-				//buscar chamadas de metodos
-				for (XMLSize_t i = 0; i < i_childrenLength; ++i) {
-					DOMNode *child = n->item(i);
-					DOMElement *e = dynamic_cast<DOMElement*>(child);
-					if (XMLString::equals(e->getTagName(), tag_method)) {
-						const XMLCh *method = e->getAttribute(tag_method);
-					} else if (XMLString::equals(e->getTagName(), tag_param)) {
-					
+				DOMNodeList *l_l1 = node->getChildNodes();
+				for (XMLSize_t i = 0; i < l_l1->getLength(); ++i) {
+					DOMNode *n = l_l1->item(i);
+					const XMLCh* tag = n->getNodeName();
+					if (XMLString::equals(tag, tag_method)) {
+						const XMLCh *tmp = n->getNodeValue();
+						request_method = XMLString::transcode(tmp);
+					} else if (XMLString::equals(tag, tag_params)) {
+						//dentro de params
+						DOMNodeList *l_l2 = n->getChildNodes();
+						for (XMLSize_t j = 0; j < l_l2->getLength(); ++j) {
+							//dentro de param
+							DOMNode *n2 = l_l2->item(j);
+							DOMNodeList *l_l3 = n2->getChildNodes();
+							for (XMLSize_t k = 0; k < l_l3->getLength(); ++k) {
+								//dentro de boletim
+								DOMNode *n3 = l_l3->item(k);
+								DOMNodeList *l_l4 = n3->getChildNodes();
+								Aluno a_add;
+								XMLCh *tag_aluno = XMLString::transcode(a_add.getTag().c_str());
+								
+								for (XMLSize_t l = 0; l < l_l4->getLength(); ++l) {
+									DOMNode *n4 = l_l4->item(l);
+									const XMLCh *tag2 = n4->getNodeName();
+									if (XMLString::equals(tag2, tag_aluno)) {
+										a_add.buildFromXml(n4);
+										a_add.insertIntoDb();
+									} else if (XMLString::equals(tag2, tag_historico)) {
+										DOMNodeList *l_l5 = n4->getChildNodes();
+										Periodo p_add(a_add.getCpf());
+										for (XMLSize_t m = 0; m < l_l5->getLength(); ++m) {
+											//dentro de historico
+											DOMNode *n5 = l_l5->item(m);
+											p_add.buildFromXml(n5);
+											p_add.insertIntoDb();
+										}
+									}
+								}
+								
+								XMLString::release(&tag_aluno);	
+							}
+						}
 					}
-					
 				}
 				
-			} catch (XMLException &e) {
 				
+			} catch (XMLException &e) {
+				string message = XMLString::transcode(e.getMessage());
+				log(message);
 			}
 			
 		}
 	}
 	
 	XMLString::release(&tag_method);
+	XMLString::release(&tag_params);
+	XMLString::release(&tag_historico);
 }
 
 bool FileManager::_validate (const string &xsdPath, const string &xmlPath) {

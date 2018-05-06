@@ -20,16 +20,16 @@ void Periodo::buildFromXml (DOMNode *node) {
 	Materia m_add;
 	XMLCh *tag_m = XMLString::transcode(m_add.getTag().c_str());
 	
-	DOMNodeList *l_children = element->getChildNodes;
+	DOMNodeList *l_children = node->getChildNodes();
 	//explorar node para recuperar materias
 	for (XMLSize_t i = 0; i < l_children->getLength(); ++i) {
 		DOMNode *n = l_children->item(i);
-		XMLCh *tag = n->getName();
-		if (XMLString::Equals(tag, tag_ano)) {
+		const XMLCh *tag = n->getNodeName();
+		if (XMLString::equals(tag, tag_ano)) {
 			this->ano = XMLString::transcode(n->getNodeValue());
-		} else if (XMLString::Equals(tag, tag_semestre)) {
+		} else if (XMLString::equals(tag, tag_semestre)) {
 			this->semestre = XMLString::transcode(n->getNodeValue());
-		} else if (XMLString::Equals(tag, tag_m)) {
+		} else if (XMLString::equals(tag, tag_m)) {
 			
 			m_add.buildFromXml(n);
 			m_add.insertIntoDb();

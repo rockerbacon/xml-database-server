@@ -19,7 +19,7 @@ namespace tebd {
 		private:
 			static unsigned int _instanceCount;
 		
-			std::atomic<std::list<std::experimental::filesystem::directory_entry>> que_files;
+			std::list<std::experimental::filesystem::directory_entry> que_files;
 			
 			std::atomic_bool b_fileCheck;
 			std::thread *thd_fileCheck;
