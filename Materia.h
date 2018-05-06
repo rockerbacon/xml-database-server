@@ -10,6 +10,7 @@ namespace tebd {
 			static std::string tag;
 			
 			std::string codigo;
+			std::string nome;
 			int creditos;
 			double conceito;
 			std::string situacao;
@@ -18,7 +19,9 @@ namespace tebd {
 			virtual void insertIntoDb (void);
 			
 			inline virtual std::string getTag (void) { return Materia::tag; }
-			virtual void buildFromXml (DOMNode *node);
+			virtual void buildFromXml (xercesc::DOMNode *node);
+			
+			inline std::string getCodigo (void) { return this->codigo; }
 		
 	};
 };

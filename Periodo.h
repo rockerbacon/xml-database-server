@@ -2,6 +2,7 @@
 
 #include "DbItem.h"
 #include "XMLItem.h"
+#include "Materia.h"
 #include <string>
 #include <list>
 
@@ -16,10 +17,12 @@ namespace tebd {
 			std::list<std::string> l_materia;	//lista com codigo de materias
 			
 		public:
+			Periodo (const std::string &cpf_aluno);
+		
 			virtual void insertIntoDb (void);
 			
 			inline virtual std::string getTag (void) { return Periodo::tag; }
-			virtual void buildFromXml (DOMNode *node);
+			virtual void buildFromXml (xercesc::DOMNode *node);
 		
 	};
 };
