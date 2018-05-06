@@ -1,13 +1,15 @@
 #pragma once
 
 #include "DbItem.h"
+#include "XMLItem.h"
 #include <string>
 
 namespace tebd {
 
-	class Aluno : public DbItem {
+	class Aluno : public DbItem, public XMLItem {
 	
 		private:
+			static std::string tag;
 			std::string cpf;
 			std::string nome;
 			std::string universidade;
@@ -18,6 +20,9 @@ namespace tebd {
 			Aluno (std::string &cpf, std::string &nome, std::string &universidade, std::string &curso);
 		
 			virtual void insertIntoDb (void);
+			
+			inline virtual std::string getTag (void) { return Aluno::tag; }
+			virtual void buildFromXml (xercesc::DOMNode *node);
 	
 	};
 
