@@ -11,11 +11,14 @@
 #include <atomic>
 #include <thread>
 #include <experimental/filesystem>
+#include <xercesc/util/PlatformUtils.hpp>
 
 namespace tebd {
 
 	class FileManager {
 		private:
+			unsigned int _instanceCount;
+		
 			std::list<std::experimental::filesystem::directory_entry> que_files;
 			
 			std::atomic_bool b_fileCheck;
@@ -23,10 +26,15 @@ namespace tebd {
 			
 			std::string s_folderPath;
 			
+			xercesc::XercesDOMParser parser;
+			
 			void _p_fileCheck (unsigned short updateInterval);
 			
+			//retorna true quando xml eh valido e false caso contrario
+			bool _validate (const std::string &xsdPath, const std::string &xmlPath);
+			
 		public:
-			FileManager (const std::string &folderPath);
+			FileManager (const std::string &folderPath, const std::string &xsd) throw (xercesc::XMLException);
 			~FileManager (void);
 			
 			//intervalo de atualizacao em millisegundos
