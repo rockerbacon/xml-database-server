@@ -9,6 +9,7 @@
 #include "Log.h"
 #include "Aluno.h"
 #include "Periodo.h"
+#include <stdio.h>
 
 using namespace tebd;
 using namespace std;
@@ -141,6 +142,8 @@ void FileManager::_p_fileParse (void) {
 				string message = XMLString::transcode(e.getMessage());
 				log(message);
 			}
+			
+			//remove(s_file.c_str());	//apagar arquivos ja processados
 			
 		}
 	}
