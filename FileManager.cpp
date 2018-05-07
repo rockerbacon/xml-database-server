@@ -21,6 +21,7 @@ FileManager::FileManager (const string &s_folderPath, const string &xsd) throw (
 	this->b_fileParse = false;
 	this->s_folderPath = realpath(s_folderPath.c_str(), NULL);
 	this->thd_fileCheck = NULL;
+	this->thd_fileParse = NULL;
 	this->s_xsdPath = realpath(xsd.c_str(), NULL);
 	if (FileManager::_instanceCount == 0) {
 		XMLPlatformUtils::Initialize();
@@ -50,6 +51,7 @@ void FileManager::_p_fileCheck (unsigned short updateInterval) {
 			
 			if (cftime > t_lastUpdate) {
 				if (this->_validate(this->s_xsdPath, file.path().string())) {
+						//TODO adicionar lock
 						this->que_files.push_back(file);
 						updated = true;
 				} else {
@@ -74,6 +76,7 @@ void FileManager::_p_fileParse (void) {
 	
 	while (this->b_fileParse) {
 		if (this->que_files.size() > 0) {
+			//TODO adicionar lock
 			string s_file = this->que_files.front().path().string();
 			this->que_files.pop_front();
 			
@@ -89,26 +92,28 @@ void FileManager::_p_fileParse (void) {
 				
 				DOMNodeList *l_l1 = node->getChildNodes();
 				for (XMLSize_t i = 0; i < l_l1->getLength(); ++i) {
+					//dentro de methodCall
 					DOMNode *n = l_l1->item(i);
 					const XMLCh* tag = n->getNodeName();
 					if (XMLString::equals(tag, tag_method)) {
-						const XMLCh *tmp = n->getNodeValue();
+						const XMLCh *tmp = n->getTextContent();
 						request_method = XMLString::transcode(tmp);
 					} else if (XMLString::equals(tag, tag_params)) {
-						//dentro de params
 						DOMNodeList *l_l2 = n->getChildNodes();
+						
 						for (XMLSize_t j = 0; j < l_l2->getLength(); ++j) {
-							//dentro de param
+							//dentro de params
 							DOMNode *n2 = l_l2->item(j);
 							DOMNodeList *l_l3 = n2->getChildNodes();
 							for (XMLSize_t k = 0; k < l_l3->getLength(); ++k) {
-								//dentro de boletim
+								//dentro de param
 								DOMNode *n3 = l_l3->item(k);
 								DOMNodeList *l_l4 = n3->getChildNodes();
 								Aluno a_add;
 								XMLCh *tag_aluno = XMLString::transcode(a_add.getTag().c_str());
 								
 								for (XMLSize_t l = 0; l < l_l4->getLength(); ++l) {
+									//dentro de boletim
 									DOMNode *n4 = l_l4->item(l);
 									const XMLCh *tag2 = n4->getNodeName();
 									if (XMLString::equals(tag2, tag_aluno)) {
@@ -131,7 +136,6 @@ void FileManager::_p_fileParse (void) {
 						}
 					}
 				}
-				
 				
 			} catch (XMLException &e) {
 				string message = XMLString::transcode(e.getMessage());

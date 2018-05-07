@@ -22,15 +22,15 @@ void Materia::buildFromXml (DOMNode *node) {
 		DOMNode *n = l_children->item(i);
 		const XMLCh *tag = n->getNodeName();
 		if (XMLString::equals(tag, tag_codigo)) {
-			this->codigo = XMLString::transcode(n->getNodeValue());
+			this->codigo = XMLString::transcode(n->getTextContent());
 		} else if (XMLString::equals(tag, tag_nome)) {
-			this->nome = XMLString::transcode(n->getNodeValue());
+			this->nome = XMLString::transcode(n->getTextContent());
 		} else if (XMLString::equals(tag, tag_creditos)) {
-			this->creditos = stoi(XMLString::transcode(n->getNodeValue()));
+			this->creditos = stoi(XMLString::transcode(n->getTextContent()));
 		} else if (XMLString::equals(tag, tag_conceito)) {
-			this->conceito = stod(XMLString::transcode(n->getNodeValue()));
+			this->conceito = stod(XMLString::transcode(n->getTextContent()));
 		} else if (XMLString::equals(tag, tag_situacao)) {
-			this->situacao = XMLString::transcode(n->getNodeValue());
+			this->situacao = XMLString::transcode(n->getTextContent());
 		}
 	}
 	

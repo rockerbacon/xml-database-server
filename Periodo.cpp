@@ -26,9 +26,9 @@ void Periodo::buildFromXml (DOMNode *node) {
 		DOMNode *n = l_children->item(i);
 		const XMLCh *tag = n->getNodeName();
 		if (XMLString::equals(tag, tag_ano)) {
-			this->ano = XMLString::transcode(n->getNodeValue());
+			this->ano = XMLString::transcode(n->getTextContent());
 		} else if (XMLString::equals(tag, tag_semestre)) {
-			this->semestre = XMLString::transcode(n->getNodeValue());
+			this->semestre = XMLString::transcode(n->getTextContent());
 		} else if (XMLString::equals(tag, tag_m)) {
 			
 			m_add.buildFromXml(n);
