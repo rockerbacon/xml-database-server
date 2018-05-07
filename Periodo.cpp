@@ -1,4 +1,6 @@
 #include "Periodo.h"
+#include "Database.h"
+#include <string>
 
 using namespace std;
 using namespace tebd;
@@ -11,7 +13,17 @@ Periodo::Periodo (const string &cpf_aluno) {
 }
 
 void Periodo::insertIntoDb (void) {
+	Database db;
+    std::string valores = "'"+cpf_aluno+"','"+ano+"','"+semestre+"'";
+    db.execute_insert("PERIODO",valores);
 
+	for(int i = 0; i<l_materia.size(); i++){
+		std::list<std::string>::iterator it;
+		for (it = l_materia.begin(); it != l_materia.end(); ++it){
+			std::string valores = "'"+*it+"','"+ano+"','"+semestre+"'";
+			db.execute_insert("MATERIA_PERIODO",valores);
+		}
+	}
 }
 
 void Periodo::buildFromXml (DOMNode *node) {

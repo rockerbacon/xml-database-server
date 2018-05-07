@@ -1,6 +1,7 @@
 *.o
 requests/*
 *.db
+*.db-journal
 test_*
 .vscode
 *.log

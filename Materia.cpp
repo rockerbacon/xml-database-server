@@ -1,4 +1,5 @@
 #include "Materia.h"
+#include "Database.h"
 
 using namespace std;
 using namespace tebd;
@@ -7,7 +8,9 @@ using namespace xercesc;
 string Materia::tag = "materia";
 
 void Materia::insertIntoDb (void) {
-
+	Database db;
+    std::string valores = "'"+codigo+"','"+nome+"',"+to_string(creditos)+","+to_string(conceito)+",'"+situacao+"'";
+    db.execute_insert("MATERIA",valores);
 }
 
 void Materia::buildFromXml (DOMNode *node) {
