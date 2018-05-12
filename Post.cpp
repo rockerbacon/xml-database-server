@@ -11,6 +11,7 @@
 using namespace std;
 using namespace tebd;
 
+//TODO mudar post para escrita de xml na pasta correta
 void postAnswer (const string &method, int value) {
 	struct sockaddr_in address;
 	int sock = 0, valread;
